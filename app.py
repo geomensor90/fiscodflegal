@@ -60,7 +60,7 @@ if anos_selecionados:
         if campo1 <= 1000:
             resultado = campo1 * row["Coluna 2"]
         else:
-            resultado = campo1 * row["Coluna 2"] + campo1 * row["Coluna 3"]
+            resultado = campo1 * row["Coluna 2"] + ((campo1-1000) * row["Coluna 3"])
         resultados.append((row["Ano"], resultado))
         soma_total += resultado
 
