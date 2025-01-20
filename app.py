@@ -681,8 +681,84 @@ def pagina_secundaria():
 
 # Função para terceira página (simples link)
 def pagina_habitese():
-    st.title("Relatório Habite-se")
-    st.write("Em construçao")
+    import streamlit as st
+
+# Função para gerar o arquivo .txt
+def gerar_txt(resultados):
+    with open("relatorio.txt", "w") as file:
+        for key, value in resultados.items():
+            file.write(f"{key}: {value}\n")
+    return "relatorio.txt"
+
+# Função para criar as perguntas e salvar as respostas
+def perguntas():
+    resultados = {}
+
+    # Pergunta 1
+    st.subheader("1. Pagamento da TEO está regular?")
+    pagamento_teo = st.radio("Escolha:", ["Aprovado", "Não regular"], key="teo")
+    if pagamento_teo == "Não regular":
+        # Opções adicionais
+        opcoes_teo = st.multiselect("Marque as opções que se aplicam:", [
+            "1.1 Não consta lançamento de TEO para este endereço",
+            "1.2 Falta pagamento da TEO no período",
+            "1.3 A área declarada na TEO é inferior à área licenciada",
+            "1.4 Não constam lançamentos de TEO para o CPF/CNPJ do interessado"
+        ], key="opcoes_teo")
+        resultados["1. Pagamento da TEO"] = f"Não regular: {', '.join(opcoes_teo)}"
+    else:
+        resultados["1. Pagamento da TEO"] = "Aprovado"
+
+    # Pergunta 2
+    st.subheader("2. O canteiro de obras e o entulho foram retirados de dentro do lote?")
+    canteiro_obras = st.radio("Escolha:", ["Aprovado", "Não regular"], key="canteiro_obras")
+    if canteiro_obras == "Não regular":
+        # Opções adicionais
+        opcoes_canteiro = st.multiselect("Marque as opções que se aplicam:", [
+            "2.1 O canteiro de obras não foi retirado",
+            "2.2 Falta retirar entulhos",
+            "2.3 O estande de vendas não foi retirado"
+        ], key="opcoes_canteiro")
+        resultados["2. Canteiro de obras e entulho"] = f"Não regular: {', '.join(opcoes_canteiro)}"
+    else:
+        resultados["2. Canteiro de obras e entulho"] = "Aprovado"
+
+    # Caixa de observações
+    st.subheader("Observações:")
+    observacoes = st.text_area("Escreva suas observações aqui:", key="observacoes")
+
+    if observacoes:
+        resultados["Observações"] = observacoes
+
+    return resultados
+
+# Função principal
+def main():
+    st.title("Relatório para habite-se (Em construção)")
+    
+    resultados = perguntas()
+
+    # Exibe o resumo das respostas
+    st.subheader("Resumo das Respostas:")
+    for key, value in resultados.items():
+        st.write(f"{key}: {value}")
+    
+    # Botão para gerar o arquivo .txt
+    if st.button("Confirmar relatório"):
+        file_name = gerar_txt(resultados)
+        
+        # Fornece o arquivo para download
+        with open(file_name, "r") as file:
+            st.download_button(
+                label="Baixar TXT",
+                data=file,
+                file_name=file_name,
+                mime="text/plain"
+            )
+
+if __name__ == "__main__":
+    main()
+
 
 # Lógica de navegação
 opcao = st.sidebar.radio("MENU", ("Taxa de Execução de Obras", "Auto Fiscal - COE", "Relatório Habite-se"))
