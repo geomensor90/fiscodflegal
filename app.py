@@ -757,13 +757,98 @@ def pagina_habitese():
     if __name__ == "__main__":
         main()
 
+def pagina_parametros():
+    import pandas as pd
+
+    # Função para procurar o valor no CSV e retornar os valores da linha
+    def procurar_valor(df, codigo):
+        # Converte o código para string e remove espaços em branco
+        codigo = str(codigo).strip()
+        
+        # Converte a coluna 'lu_cipu' para string e remove espaços em branco
+        resultado = df[df['lu_cipu'].astype(str).str.strip() == codigo]  
+        
+        if not resultado.empty:
+            # Retorna o índice da linha e os valores de todas as colunas da linha
+            indice = resultado.index[0]  # Índice da linha onde o código foi encontrado
+            linha = resultado.iloc[0]  # Valores de todas as colunas dessa linha
+            return indice, linha
+        else:
+            return None, "Código não encontrado"
+
+    # Função para mapear os nomes das colunas para nomes amigáveis
+    def mapear_nomes(coluna):
+        mapeamento = {
+            "lu_cipu": "Código CIPU",
+            "lu_end_car": "Endereço Cartorial",
+            "lu_ra_luos": "LUOS",
+            "lu_uos_par": "UOS Par",
+            "st_area_sh": "Área",
+            "lu_padrao_": "LUOS",
+            "lu_ini_fai": "Inicio de faixa LUOS",
+            "lu_fim_fai": "Fim de faixa LUOS",
+            "lu_cfa_b": "Aproveitamento básico", 
+            "lu_cfa_m": "Aproveitamento máximo",
+            "lu_tx_ocu": "Faixa de ocupação",
+            "lu_tx_perm": "Taxa de permeabilidade",
+            "lu_alt_max": "Altura máxima",
+            "lu_afr": "Afastamento frontal", 
+            "lu_afu": "Afastamento fundos", 
+            "lu_aft_lat": "Afastamento lateral", 
+            "llu_aft_l_1": "Afastamento lateral", 
+            "lu_aft_obs": "Observação nos afastamentos", 
+            "lu_marquis": "Marquise",
+            "lu_galeria": "Galeria",
+            "lu_cota_so": "Cotas",
+            "lu_notas": "Notas",
+            "lu_subsol": "Subsolo",
+            # Adicione mais mapeamentos conforme necessário
+        }
+        return mapeamento.get(coluna, None)  # Retorna o nome mapeado ou None se não estiver no mapeamento
+
+    # Função principal
+    def main():
+        st.title("Busca dos parâmetros através do CIPU")
+
+        # Carregar o arquivo CSV localmente (LUOS.csv) com codificação UTF-8 ou ISO-8859-1
+        try:
+            df = pd.read_csv('LUOS.csv', encoding='utf-8')  # Tente 'utf-8', ou use 'ISO-8859-1' se houver erro de codificação
+            st.write("O código CIPU poderá ser encontrado no SEi")
+            
+            # Solicitar o código que o usuário deseja procurar
+            codigo = st.text_input("Digite o código CIPU", "")
+
+            # Botão para realizar a busca
+            if st.button("Buscar") and codigo:
+                indice, linha = procurar_valor(df, codigo)
+                if indice is not None:
+
+                    # Exibir apenas as colunas que estão no mapeamento
+                    for coluna, valor in linha.items():
+                        nome_amigavel = mapear_nomes(coluna)
+                        if nome_amigavel:  # Só exibe se a coluna estiver no mapeamento
+                            st.write(f"{nome_amigavel}: {valor}")
+                else:
+                    st.write(linha)
+        
+        except FileNotFoundError:
+            st.error("O arquivo LUOS.csv não foi encontrado. Certifique-se de que ele está no mesmo diretório do script.")
+        except UnicodeDecodeError:
+            st.error("Erro de codificação ao ler o arquivo. Tente utilizar 'ISO-8859-1' ou outra codificação.")
+
+    # Rodar o aplicativo
+    if __name__ == "__main__":
+        main()
+
 
 # Lógica de navegação
-opcao = st.sidebar.radio("MENU", ("Taxa de Execução de Obras", "Auto Fiscal - COE", "Relatório Habite-se"))
+opcao = st.sidebar.radio("MENU", ("Taxa de Execução de Obras", "Auto Fiscal - COE", "Relatório Habite-se", "Parâmetros Urbanísticos"))
 
 if opcao == "Taxa de Execução de Obras":
     pagina_teo()
 elif opcao == "Auto Fiscal - COE":
     pagina_secundaria()
+elif opcao == "Parâmetros Urbanísticos":
+    pagina_parametros()
 else:
     pagina_habitese()
