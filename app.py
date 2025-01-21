@@ -630,10 +630,10 @@ def pagina_secundaria():
     },
     }
     
-        # Interface do aplicativo
-        st.title("Sistema de Infrações")
+    # Interface do aplicativo
+    st.title("Sistema de Infrações")
     
-        # Interface do aplicativo
+    # Interface do aplicativo
     st.title("Sistema de Infrações")
     
     # Entrada de dados do usuário
