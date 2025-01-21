@@ -708,27 +708,27 @@ def pagina_secundaria():
         # Salvar o resultado no estado da sessão
         st.session_state["resultado_editado"] = resultado_copy
     
-        # Inicializar o campo editável se não estiver no estado da sessão
-        if "resultado_editado" not in st.session_state:
-            st.session_state["resultado_editado"] = ""
+    # Inicializar o campo editável se não estiver no estado da sessão
+    if "resultado_editado" not in st.session_state:
+        st.session_state["resultado_editado"] = ""
         
-        # Exibição do conteúdo para cópia e edição
-        resultado_editado = st.text_area(
-            "Resultado para editar e copiar",
-            st.session_state["resultado_editado"],
-            height=300
-        )
+    # Exibição do conteúdo para cópia e edição
+    resultado_editado = st.text_area(
+        "Resultado para editar e copiar",
+        st.session_state["resultado_editado"],
+        height=300
+    )
         
-        # Atualizar o estado da sessão ao editar
-        st.session_state["resultado_editado"] = resultado_editado
+    # Atualizar o estado da sessão ao editar
+    st.session_state["resultado_editado"] = resultado_editado
         
-        # Botão para baixar o arquivo .txt
-        st.download_button(
-            label="Salvar como .txt",
-            data=st.session_state["resultado_editado"],
-            file_name="resultado_infracao.txt",
-            mime="text/plain"
-        )
+    # Botão para baixar o arquivo .txt
+    st.download_button(
+        label="Salvar como .txt",
+        data=st.session_state["resultado_editado"],
+        file_name="resultado_infracao.txt",
+        mime="text/plain"
+    )
     
 
 # Função para terceira página (simples link)
