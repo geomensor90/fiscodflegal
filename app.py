@@ -721,7 +721,7 @@ def pagina_secundaria():
         
     # Atualizar o estado da sessão ao editar
     st.session_state["resultado_editado"] = resultado_editado
-        
+    st.title("Para salvar, pressione CTRL + Enter")    
     # Botão para baixar o arquivo .txt
     st.download_button(
         label="Salvar como .txt",
