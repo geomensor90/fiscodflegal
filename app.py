@@ -628,108 +628,108 @@ def pagina_secundaria():
         'infracao_detalhamento': 'Descumprimento de Auto Advertência nºxxxx-xxxxxx-OEU. Providenciar o Atestado de Conclusão de Obras',
         'infracao_embasamento': 'Arts. 13, X, 117, 122, 123, §4º, I, 124, II, 126, IV, 127, 128 da Lei nº 6.138/2018. Arts 10, 167, 168, II, 172, 173, 174, 175, 176 do Dec. 43.056/2022',
     },
-}
-
-    # Interface do aplicativo
+    }
+    
+        # Interface do aplicativo
+        st.title("Sistema de Infrações")
+    
+        # Interface do aplicativo
     st.title("Sistema de Infrações")
-
-    # Interface do aplicativo
-st.title("Sistema de Infrações")
-
-# Entrada de dados do usuário
-area = st.number_input("Área (m²):", min_value=0.0, format="%.2f")
-
-# Seleção de infração
-nome_infracao = st.selectbox("Selecione a infração:", options=list(infracoes.keys()))
-
-# Seleção de ação
-acao = st.radio("Escolha a ação:", [
-    "Auto de Notificação",
-    "Auto de Embargo",
-    "Intimação Demolitória",
-    "Auto de Apreensão",
-    "Auto de Infração"
-])
-
-# Seleção múltipla: Fase da Obra
-fases_obra = st.multiselect(
-    "Fase da Obra - Serviços Iniciados:",
-    options=[
-        "Movimentação de terras",
-        "Fundações",
-        "Alvenarias",
-        "Concretagem de lajes",
-        "Instalações",
-        "Revestimentos",
-        "Cobertura",
-        "Acabamento"
-    ]
-)
-
-# Variável para armazenar o conteúdo a ser copiado
-resultado_copy = ""
-
-# Botão para exibir o resultado
-if st.button("Exibir Resultado"):
-    infracao = infracoes[nome_infracao]
-
-    # Informações gerais
-    resultado_copy += f"Nome: {infracao['nome']}\n"
-    resultado_copy += f"Nível: {infracao['nivel']}\n"
-    resultado_copy += f"Infratores: {infracao['Infratores']}\n"
-    resultado_copy += f"Legislação Infringida: {infracao['legislacao_infringida']}\n"
-    resultado_copy += f"Assuntos/Casos: {infracao['Assuntos_Casos']}\n"
-    resultado_copy += f"Necessária Advertência/Notificação: {infracao['nec_adver_notifca']}\n"
-
-    # Exibição das fases selecionadas
-    resultado_copy += "\nFase da Obra - Serviços Iniciados: "
-    if fases_obra:
-        resultado_copy += ", ".join(fases_obra)
-    else:
-        resultado_copy += "Nenhuma fase selecionada."
-
-    # Detalhamento por ação
-    if acao == "Auto de Notificação":
-        resultado_copy += f"\nDetalhamento: {infracao['detalhamento_advertencia']}\n"
-        resultado_copy += f"Embasamento: {infracao['embasamento_advertencia']}\n"
-    elif acao == "Auto de Embargo":
-        resultado_copy += f"\nDetalhamento: {infracao['detalhamento_embargo']}\n"
-        resultado_copy += f"Embasamento: {infracao['embasamento_embargo']}\n"
-    elif acao == "Intimação Demolitória":
-        resultado_copy += f"\nDetalhamento: {infracao['detalhamento_intimacao']}\n"
-        resultado_copy += f"Embasamento: {infracao['embasamento_intimacao']}\n"
-    elif acao == "Auto de Apreensão":
-        resultado_copy += f"\nDetalhamento: {infracao['detalhamento_apreensao']}\n"
-        resultado_copy += f"Embasamento: {infracao['embasamento_apreensao']}\n"
-    elif acao == "Auto de Infração":
-        resultado_copy += f"\nDetalhamento: {infracao['infracao_detalhamento']}\n"
-        resultado_copy += f"Embasamento: {infracao['infracao_embasamento']}\n"
-
-    # Salvar o resultado no estado da sessão
-    st.session_state["resultado_editado"] = resultado_copy
-
-    # Inicializar o campo editável se não estiver no estado da sessão
-    if "resultado_editado" not in st.session_state:
-        st.session_state["resultado_editado"] = ""
     
-    # Exibição do conteúdo para cópia e edição
-    resultado_editado = st.text_area(
-        "Resultado para editar e copiar",
-        st.session_state["resultado_editado"],
-        height=300
+    # Entrada de dados do usuário
+    area = st.number_input("Área (m²):", min_value=0.0, format="%.2f")
+    
+    # Seleção de infração
+    nome_infracao = st.selectbox("Selecione a infração:", options=list(infracoes.keys()))
+    
+    # Seleção de ação
+    acao = st.radio("Escolha a ação:", [
+        "Auto de Notificação",
+        "Auto de Embargo",
+        "Intimação Demolitória",
+        "Auto de Apreensão",
+        "Auto de Infração"
+    ])
+    
+    # Seleção múltipla: Fase da Obra
+    fases_obra = st.multiselect(
+        "Fase da Obra - Serviços Iniciados:",
+        options=[
+            "Movimentação de terras",
+            "Fundações",
+            "Alvenarias",
+            "Concretagem de lajes",
+            "Instalações",
+            "Revestimentos",
+            "Cobertura",
+            "Acabamento"
+        ]
     )
     
-    # Atualizar o estado da sessão ao editar
-    st.session_state["resultado_editado"] = resultado_editado
+    # Variável para armazenar o conteúdo a ser copiado
+    resultado_copy = ""
     
-    # Botão para baixar o arquivo .txt
-    st.download_button(
-        label="Salvar como .txt",
-        data=st.session_state["resultado_editado"],
-        file_name="resultado_infracao.txt",
-        mime="text/plain"
-    )
-
+    # Botão para exibir o resultado
+    if st.button("Exibir Resultado"):
+        infracao = infracoes[nome_infracao]
+    
+        # Informações gerais
+        resultado_copy += f"Nome: {infracao['nome']}\n"
+        resultado_copy += f"Nível: {infracao['nivel']}\n"
+        resultado_copy += f"Infratores: {infracao['Infratores']}\n"
+        resultado_copy += f"Legislação Infringida: {infracao['legislacao_infringida']}\n"
+        resultado_copy += f"Assuntos/Casos: {infracao['Assuntos_Casos']}\n"
+        resultado_copy += f"Necessária Advertência/Notificação: {infracao['nec_adver_notifca']}\n"
+    
+        # Exibição das fases selecionadas
+        resultado_copy += "\nFase da Obra - Serviços Iniciados: "
+        if fases_obra:
+            resultado_copy += ", ".join(fases_obra)
+        else:
+            resultado_copy += "Nenhuma fase selecionada."
+    
+        # Detalhamento por ação
+        if acao == "Auto de Notificação":
+            resultado_copy += f"\nDetalhamento: {infracao['detalhamento_advertencia']}\n"
+            resultado_copy += f"Embasamento: {infracao['embasamento_advertencia']}\n"
+        elif acao == "Auto de Embargo":
+            resultado_copy += f"\nDetalhamento: {infracao['detalhamento_embargo']}\n"
+            resultado_copy += f"Embasamento: {infracao['embasamento_embargo']}\n"
+        elif acao == "Intimação Demolitória":
+            resultado_copy += f"\nDetalhamento: {infracao['detalhamento_intimacao']}\n"
+            resultado_copy += f"Embasamento: {infracao['embasamento_intimacao']}\n"
+        elif acao == "Auto de Apreensão":
+            resultado_copy += f"\nDetalhamento: {infracao['detalhamento_apreensao']}\n"
+            resultado_copy += f"Embasamento: {infracao['embasamento_apreensao']}\n"
+        elif acao == "Auto de Infração":
+            resultado_copy += f"\nDetalhamento: {infracao['infracao_detalhamento']}\n"
+            resultado_copy += f"Embasamento: {infracao['infracao_embasamento']}\n"
+    
+        # Salvar o resultado no estado da sessão
+        st.session_state["resultado_editado"] = resultado_copy
+    
+        # Inicializar o campo editável se não estiver no estado da sessão
+        if "resultado_editado" not in st.session_state:
+            st.session_state["resultado_editado"] = ""
+        
+        # Exibição do conteúdo para cópia e edição
+        resultado_editado = st.text_area(
+            "Resultado para editar e copiar",
+            st.session_state["resultado_editado"],
+            height=300
+        )
+        
+        # Atualizar o estado da sessão ao editar
+        st.session_state["resultado_editado"] = resultado_editado
+        
+        # Botão para baixar o arquivo .txt
+        st.download_button(
+            label="Salvar como .txt",
+            data=st.session_state["resultado_editado"],
+            file_name="resultado_infracao.txt",
+            mime="text/plain"
+        )
+    
 
 # Função para terceira página (simples link)
 def pagina_habitese():
