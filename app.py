@@ -11,43 +11,66 @@ dados = {
 
 df = pd.DataFrame(dados)
 
-# Função para primeira página (calculadora TEO)
 def pagina_teo():
     st.title("Taxa de Execução de Obras (TEO)")
 
+    # Entrada do usuário para a área da construção
     campo1 = st.number_input("Insira a área da construção em m²:", min_value=0.0, step=1.0, format="%.2f")
 
     if campo1 <= 0:
         st.warning("Insira uma área válida para continuar.")
-    else:
-        anos_selecionados = []
-        st.subheader("Selecione os anos:")
-        for ano in df["Ano"]:
-            if st.checkbox(str(ano)):
-                anos_selecionados.append(ano)
-
-        if anos_selecionados:
-            dados_filtrados = df[df["Ano"].isin(anos_selecionados)]
-            if dados_filtrados.empty:
-                st.warning("Nenhum dado encontrado para os anos selecionados.")
-            else:
-                resultados = []
-                soma_total = 0
-                for _, row in dados_filtrados.iterrows():
-                    if campo1 <= 1000:
-                        resultado = campo1 * row["Coluna 2"]
-                    else:
-                        resultado = 1000 * row["Coluna 2"] + ((campo1 - 1000) * row["Coluna 3"])
-                    resultados.append((row["Ano"], resultado))
-                    soma_total += resultado
-
-                st.subheader("Resultados")
-                for ano, resultado in resultados:
-                    st.write(f"Ano {ano:.0f}: R$ {resultado:.2f}")
-
+        return
+    
+    # Seleção dos anos
+    st.subheader("Selecione os anos:")
+    anos_selecionados = [ano for ano in df["Ano"] if st.checkbox(str(ano))]
+    
+    if not anos_selecionados:
+        st.warning("Por favor, selecione ao menos um ano.")
+        return
+    
+    # Filtrando os dados
+    dados_filtrados = df[df["Ano"].isin(anos_selecionados)]
+    
+    if dados_filtrados.empty:
+        st.warning("Nenhum dado encontrado para os anos selecionados.")
+        return
+    
+    # Cálculo dos valores
+    resultados = []
+    soma_total = 0
+    exct = 0
+    area_real = 0 
+    
+    for _, row in dados_filtrados.iterrows():
+        if campo1 <= 1000:
+            resultado = campo1 * row["Coluna 2"]
         else:
-            st.warning("Por favor, selecione ao menos um ano.")
+            resultado = 1000 * row["Coluna 2"] + ((campo1 - 1000) * row["Coluna 3"])
+            exct = (campo1 - 1000)
+        resultados.append((row["Ano"], resultado))
+        soma_total += resultado
 
+    if campo1 <= 1000:
+        area_real = campo1
+    else:
+        area_real = 1000
+    
+    # Exibição dos resultados
+    st.subheader("Resultados")
+    for ano, resultado in resultados:
+        st.write(f"**Ano {int(ano)}**")
+        st.write(f"Fica o responsável pela execução da obra, AUTUADO por não efetuar a declaração da Taxa de Execução de Obras - TEO, referente ao exercício {int(ano)}")
+        st.write(f"Memória de Cálculo:")        
+        st.write(f"Metro quadrado até áreas de 1000m²= R$ {row["Coluna 2"]}")
+        st.write(f"Valor excedente = R$ {row["Coluna 3"]}")
+        st.write(f"Área (m²) {campo1:.2f}")
+        st.write(f"Valor até 1000m² = {area_real:.2f} X {row["Coluna 2"]}= R$ {(area_real * row['Coluna 2']):.2f} ")
+        st.write(f"Valor excedente = {exct:.2f} X {row["Coluna 3"]}= R$ {(exct * row['Coluna 3']):.2f} ")
+        st.write(f"Valor total para {int(ano)}: R$ {resultado:.2f}")     
+        st.write(f"Prazo: 30 dias")  
+        st.write(f"--------------------------------------")
+        
 # Função para segunda página (simples link)
 def pagina_secundaria():
 # Dicionário com os dados das infrações
