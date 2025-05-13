@@ -128,9 +128,6 @@ if st.button("🔍 Procurar em todos os shapefiles", type="primary"):
                     st.write(f"Macro Zona: {row['macrozona']}")
                 if row['Shapefile'] == 'zoneamento_do_distrito_federal' and 'sigla' in row:
                     st.write(f"Sigla: {row['sigla']}")
-                    
-                if row['Shapefile'] == 'zoneamento_do_distrito_federal' and 'macroarea' in row:
-                    st.write(f"Macro Área: {row['macroarea']}"))
             
             # Adicione mais condições conforme necessário para outros shapefiles
             # --------------------------------------------------
