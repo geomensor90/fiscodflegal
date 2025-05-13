@@ -157,15 +157,7 @@ if st.button("🔍 Procurar em todos os shapefiles", type="primary"):
 # Cria mapa centrado no DF
 
 
-wms = folium.WmsTileLayer(
-    url="https://www.geoservicos.ide.df.gov.br/arcgis/services/Publico/IDEDF/MapServer/WmsServer",
-    layers='103',
-    name='Uso do Solo DF',
-    version='1.3.0',
-    format='image/png',
-    transparent=True
-)
-wms.add_to(m)
+
 
 # Adiciona controle de camadas
 folium.LayerControl().add_to(m)
@@ -174,32 +166,4 @@ folium.LayerControl().add_to(m)
 st_folium(m, width=1200, height=600, returned_objects=[])
 
 
-# Adicione mais verificações para outros shapefiles conforme necessário
-# if shapefiles.get('outro_shapefile') is not None:
-#     if 'coluna_desejada' in shapefiles['outro_shapefile'].columns:
-#         st.write(...)
-# Debug (opcional)
-#with st.expander("🔧 Debug info", expanded=False):
-#    st.write("Ponto analisado:", ponto)
-#    st.write("Sistema de coordenadas dos shapefiles:")
-#    st.json({name: str(gdf.crs) for name, gdf in shapefiles.items()})
-resultados = st.session_state.get('resultados', 0)
-if resultados:
-    st.success(f"✅ Encontrado em {len(resultados)} polígono(s)")
-    df = pd.DataFrame(resultados)
 
-    if not df.empty:
-            # --------------------------------------------------
-            # NOVO CÓDIGO PARA MOSTRAR INFORMAÇÕES ESPECÍFICAS
-            # --------------------------------------------------
-        st.subheader("Informações do Polígono")
-            
-        for _, row in df.iterrows():
-            if row['Shapefile'] == 'conjunto' and 'cj_conjunt' in row:
-                st.write(f"Conjunto: {row['cj_conjunt']}")
-                    
-            if row['Shapefile'] == 'AREA_IMOVEL_1' and 'cod_imovel' in row:
-                st.write(f"CAR: {row['cod_imovel']}")
-            
-            # Adicione mais condições conforme necessário para outros shapefiles
-            # --------------------------------------------------
