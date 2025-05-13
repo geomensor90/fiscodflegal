@@ -122,11 +122,15 @@ if st.button("🔍 Procurar em todos os shapefiles", type="primary"):
             st.subheader("Informações do Polígono")
             
             for _, row in df.iterrows():
-                if row['Shapefile'] == 'conjunto' and 'cj_conjunt' in row:
-                    st.write(f"Conjunto: {row['cj_conjunt']}")
+                if row['Shapefile'] == 'zoneamento_do_distrito_federal' and 'macroarea' in row:
+                    st.write(f"Macro Área: {row['macroarea']}")
+                if row['Shapefile'] == 'zoneamento_do_distrito_federal' and 'macrozona' in row:
+                    st.write(f"Macro Zona: {row['macrozona']}")
+                if row['Shapefile'] == 'zoneamento_do_distrito_federal' and 'sigla' in row:
+                    st.write(f"Sigla: {row['sigla']}")
                     
-                if row['Shapefile'] == 'AREA_IMOVEL_1' and 'cod_tema' in row:
-                    st.write(f"CAR: {row['cod_tema']}")
+                if row['Shapefile'] == 'zoneamento_do_distrito_federal' and 'macroarea' in row:
+                    st.write(f"Macro Área: {row['macroarea']}"))
             
             # Adicione mais condições conforme necessário para outros shapefiles
             # --------------------------------------------------
