@@ -14,12 +14,24 @@ st.title("🗺️ Localizador de Polígonos")
 DEFAULT_LAT = -15.817533
 DEFAULT_LON = -47.978620
 
+# Inicializar variáveis de sessão para coordenadas
+if 'lat' not in st.session_state:
+    st.session_state.lat = DEFAULT_LAT
+if 'lon' not in st.session_state:
+    st.session_state.lon = DEFAULT_LON
+
 # Widgets de entrada
 col1, col2 = st.columns(2)
 with col1:
-    lat = st.number_input("Latitude", value=DEFAULT_LAT, format="%.6f")
+    lat = st.number_input("Latitude", value=st.session_state.lat, format="%.6f", key="lat_input")
 with col2:
-    lon = st.number_input("Longitude", value=DEFAULT_LON, format="%.6f")
+    lon = st.number_input("Longitude", value=st.session_state.lon, format="%.6f", key="lon_input")
+
+# Atualizar sessão se os inputs foram alterados manualmente
+if lat != st.session_state.lat or lon != st.session_state.lon:
+    st.session_state.lat = lat
+    st.session_state.lon = lon
+    st.rerun()
 
 # Pasta dos shapefiles
 SHAPEFILE_DIR = "shapefiles"
@@ -59,19 +71,31 @@ else:
     st.error(f"Diretório '{SHAPEFILE_DIR}' não existe!")
     st.stop()
 
-# Mostrar arquivos carregados
-with st.expander("📁 Shapefiles carregados", expanded=False):
-    st.write(f"Total de shapefiles: {len(shapefiles)}")
-    st.json(st.session_state.get('loaded_files', []))
-
 # Criar mapa
-m = folium.Map(location=[lat, lon], zoom_start=16)
-ponto = Point(lon, lat)
+m = folium.Map(location=[st.session_state.lat, st.session_state.lon], zoom_start=16)
+
+# Adicionar evento de clique para capturar coordenadas
+m.add_child(folium.LatLngPopup())
+
+ponto = Point(st.session_state.lon, st.session_state.lat)
 folium.Marker(
-    [lat, lon],
+    [st.session_state.lat, st.session_state.lon],
     tooltip="Seu ponto",
     icon=folium.Icon(color="red", icon="map-pin")
 ).add_to(m)
+
+# Processar interação com o mapa
+map_interaction = st_folium(m, width=1200, height=600, returned_objects=["last_clicked"])
+
+# Atualizar coordenadas se o usuário clicar no mapa
+if map_interaction and map_interaction.get("last_clicked"):
+    clicked_lat = map_interaction["last_clicked"]["lat"]
+    clicked_lon = map_interaction["last_clicked"]["lng"]
+    
+    # Atualizar valores na sessão
+    st.session_state.lat = clicked_lat
+    st.session_state.lon = clicked_lon
+    st.rerun()
 
 # Processamento principal
 if st.button("🔍 Procurar em todos os shapefiles", type="primary"):
@@ -116,9 +140,6 @@ if st.button("🔍 Procurar em todos os shapefiles", type="primary"):
         df = pd.DataFrame(resultados)
 
         if not df.empty:
-            # --------------------------------------------------
-            # NOVO CÓDIGO PARA MOSTRAR INFORMAÇÕES ESPECÍFICAS
-            # --------------------------------------------------
             st.subheader("Informações do Polígono")
             
             for _, row in df.iterrows():
@@ -129,12 +150,6 @@ if st.button("🔍 Procurar em todos os shapefiles", type="primary"):
                 if row['Shapefile'] == 'zoneamento_do_distrito_federal' and 'sigla' in row:
                     st.write(f"Sigla: {row['sigla']}")
             
-            # Adicione mais condições conforme necessário para outros shapefiles
-            # --------------------------------------------------
-
-
-        
-        
         # Ordenar por shapefile e ID
         df = df.sort_values(by=['Shapefile', 'ID_Polígono'])
         
@@ -154,17 +169,6 @@ if st.button("🔍 Procurar em todos os shapefiles", type="primary"):
         )
     else:
         st.warning("Nenhum polígono encontrado contendo o ponto")
-# Configuração otimizada do WMS
-# Cria mapa centrado no DF
-
-
-
 
 # Adiciona controle de camadas
 folium.LayerControl().add_to(m)
-
-# Mostrar mapa
-st_folium(m, width=1200, height=600, returned_objects=[])
-
-
-
