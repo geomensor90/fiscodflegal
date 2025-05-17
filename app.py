@@ -5,6 +5,7 @@ import folium
 from streamlit_folium import st_folium
 from shapely.geometry import Point
 import os
+import json
 
 # Configurações iniciais
 st.set_page_config(page_title="Detector de Shapefiles", layout="wide")
@@ -172,3 +173,137 @@ if st.button("🔍 Procurar em todos os shapefiles", type="primary"):
 
 # Adiciona controle de camadas
 folium.LayerControl().add_to(m)
+
+# Dados JSON fornecidos
+data = {
+  "Macrozona Urbana": {
+    "Ocupação Regular": {
+      "Com Diretriz": {
+        "Terras Públicas - Desapropriadas": {
+          "Sem Parcelamento": 1,
+          "Parcelamento de Fato": 4,
+          "Parcelamento Aprovado": 2,
+          "Parcelamento Registrado": 1
+        },
+        "Terras Privadas - Não Desapropriadas": {
+          "Sem Parcelamento": 2,
+          "Parcelamento de Fato": 8,
+          "Parcelamento Aprovado": 4,
+          "Parcelamento Registrado": 2
+        },
+        "Terras Públicas/Privadas - Desapropriadas em Comum": {
+          "Sem Parcelamento": 3,
+          "Parcelamento de Fato": 12,
+          "Parcelamento Aprovado": 6,
+          "Parcelamento Registrado": 3
+        }
+      },
+      "Sem Diretriz": {
+        "Terras Públicas - Desapropriadas": {
+          "Sem Parcelamento": 2,
+          "Parcelamento de Fato": 8,
+          "Parcelamento Aprovado": 4,
+          "Parcelamento Registrado": 2
+        },
+        "Terras Privadas - Não Desapropriadas": {
+          "Sem Parcelamento": 4,
+          "Parcelamento de Fato": 16,
+          "Parcelamento Aprovado": 8,
+          "Parcelamento Registrado": 4
+        },
+        "Terras Públicas/Privadas - Desapropriadas em Comum": {
+          "Sem Parcelamento": 6,
+          "Parcelamento de Fato": 24,
+          "Parcelamento Aprovado": 12,
+          "Parcelamento Registrado": 6
+        }
+      }
+    },
+    "Ocupação Irregular com Área de regularização ": {
+      "Com Diretriz": {
+        "Terras Públicas - Desapropriadas": {
+          "Sem Parcelamento": 9,
+          "Parcelamento de Fato": 36,
+          "Parcelamento Aprovado": 18,
+          "Parcelamento Registrado": 9
+        },
+        "Terras Privadas - Não Desapropriadas": {
+          "Sem Parcelamento": 18,
+          "Parcelamento de Fato": 72,
+          "Parcelamento Aprovado": 36,
+          "Parcelamento Registrado": 18
+        },
+        "Terras Públicas/Privadas - Desapropriadas em Comum": {
+          "Sem Parcelamento": 27,
+          "Parcelamento de Fato": 108,
+          "Parcelamento Aprovado": 54,
+          "Parcelamento Registrado": 27
+        }
+      },
+      "Sem Diretriz": {
+        "Terras Públicas - Desapropriadas": {
+          "Sem Parcelamento": 18,
+          "Parcelamento de Fato": 72,
+          "Parcelamento Aprovado": 36,
+          "Parcelamento Registrado": 18
+        },
+        "Terras Privadas - Não Desapropriadas": {
+          "Sem Parcelamento": 36,
+          "Parcelamento de Fato": 144,
+          "Parcelamento Aprovado": 72,
+          "Parcelamento Registrado": 36
+        },
+        "Terras Públicas/Privadas - Desapropriadas em Comum": {
+          "Sem Parcelamento": 54,
+          "Parcelamento de Fato": 216,
+          "Parcelamento Aprovado": 108,
+          "Parcelamento Registrado": 54
+        }
+      }
+    }
+  }
+}
+
+def main():
+    st.title("GRAVIDADE TERRITORIAL")
+    
+    # Nível 1: Macrozona
+    macrozona_options = list(data.keys())
+    selected_macrozona = st.selectbox("Selecione a Macrozona:", macrozona_options)
+    
+    if selected_macrozona:
+        # Nível 2: Tipo de Ocupação
+        ocupacao_options = list(data[selected_macrozona].keys())
+        selected_ocupacao = st.selectbox("Selecione o Tipo de Ocupação:", ocupacao_options)
+        
+        if selected_ocupacao:
+            # Nível 3: Diretriz
+            diretriz_options = list(data[selected_macrozona][selected_ocupacao].keys())
+            selected_diretriz = st.selectbox("Selecione a Diretriz:", diretriz_options)
+            
+            if selected_diretriz:
+                # Nível 4: Tipo de Terras
+                terras_options = list(data[selected_macrozona][selected_ocupacao][selected_diretriz].keys())
+                selected_terras = st.selectbox("Selecione o Tipo de Terras:", terras_options)
+                
+                if selected_terras:
+                    # Nível 5: Parcelamento
+                    parcelamento_options = list(data[selected_macrozona][selected_ocupacao][selected_diretriz][selected_terras].keys())
+                    selected_parcelamento = st.selectbox("Selecione o Tipo de Parcelamento:", parcelamento_options)
+                    
+                    if selected_parcelamento:
+                        # Mostrar o valor correspondente
+                        valor = data[selected_macrozona][selected_ocupacao][selected_diretriz][selected_terras][selected_parcelamento]
+                        st.success(f"Valor selecionado: {valor}")
+                        
+                        # Mostrar o caminho completo selecionado
+                        #st.subheader("Caminho selecionado:")
+                        #st.write(f"Macrozona: {selected_macrozona}")
+                        #st.write(f"Ocupação: {selected_ocupacao}")
+                        #st.write(f"Diretriz: {selected_diretriz}")
+                        #st.write(f"Terras: {selected_terras}")
+                        #st.write(f"Parcelamento: {selected_parcelamento}")
+                        #st.write(f"Valor: {valor}")
+
+if __name__ == "__main__":
+    main()
