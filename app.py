@@ -7,13 +7,19 @@ from shapely.geometry import Point
 import os
 import json
 
+# Limpa o cache de dados
+st.cache_data.clear()
+
+# Limpa o cache de recursos (ex.: conexões, objetos grandes, etc.)
+st.cache_resource.clear()
+
 # Configurações iniciais
 st.set_page_config(page_title="Detector de Shapefiles", layout="wide")
 st.title("🗺️ Localizador de Polígonos")
 
 # Coordenadas padrão de Brasília
-DEFAULT_LAT = -15.817533
-DEFAULT_LON = -47.978620
+DEFAULT_LAT = -15.614039
+DEFAULT_LON = -47.666706
 
 # Inicializar variáveis de sessão para coordenadas
 if 'lat' not in st.session_state:
@@ -73,7 +79,30 @@ else:
     st.stop()
 
 # Criar mapa
-m = folium.Map(location=[st.session_state.lat, st.session_state.lon], zoom_start=16)
+m = folium.Map(
+    location=[st.session_state.lat, st.session_state.lon],
+    zoom_start=16,
+    name='Satélite (Google Earth)',
+    #tiles='https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+    attr='Google Earth',
+    control_scale=True
+)
+
+# Adicionar controle de camadas para alternar entre satélite e mapa
+folium.TileLayer(
+    tiles='https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+    attr='Google Maps',
+    name='Mapa de Ruas'
+).add_to(m)
+
+
+folium.TileLayer(
+    tiles='https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+    attr='Google Híbrido',
+    name='Híbrido (Satélite + Ruas)'
+).add_to(m)
+
+folium.LayerControl().add_to(m)
 
 # Adicionar evento de clique para capturar coordenadas
 m.add_child(folium.LatLngPopup())
@@ -99,7 +128,7 @@ if map_interaction and map_interaction.get("last_clicked"):
     st.rerun()
 
 # Processamento principal
-if st.button("🔍 Procurar em todos os shapefiles", type="primary"):
+if st.button("📄 Gerar Relatório 📄", type="primary"):
     resultados = []
     
     with st.status("Analisando polígonos...", expanded=True) as status:
@@ -133,33 +162,82 @@ if st.button("🔍 Procurar em todos os shapefiles", type="primary"):
             except Exception as e:
                 st.error(f"Erro no shapefile {name}: {str(e)}")
         
-        status.update(label="Análise concluída!", state="complete")
+        #status.update(label="Informações Geradas!", state="complete")
     
     # Mostrar resultados
     if resultados:
-        st.success(f"✅ Encontrado em {len(resultados)} polígono(s)")
+        st.success(f"✅ O ponto informado está inserido em {len(resultados)} polígono(s)")
         df = pd.DataFrame(resultados)
 
         if not df.empty:
-            st.subheader("Informações do Polígono")
+            st.header("Relatório de Localização Geográfica")
             
             for _, row in df.iterrows():
-                if row['Shapefile'] == 'zoneamento_do_distrito_federal' and 'macroarea' in row:
-                    st.write(f"Macro Área: {row['macroarea']}")
-                if row['Shapefile'] == 'zoneamento_do_distrito_federal' and 'macrozona' in row:
-                    st.write(f"Macro Zona: {row['macrozona']}")
-                if row['Shapefile'] == 'zoneamento_do_distrito_federal' and 'sigla' in row:
-                    st.write(f"Sigla: {row['sigla']}")
+                # Zoneamento do Distrito Federal
+                if row['Shapefile'] == 'zoneamento_do_distrito_federal':
+                    # Exibir o título uma vez
+                    st.subheader("Zoneamento do Distrito Federal")
+                    
+                    # Exibir as informações, se existirem
+                    if 'macroarea' in row:
+                        st.write(f"Macro Área: {row['macroarea']}")
+                    if 'macrozona' in row:
+                        st.write(f"Macro Zona: {row['macrozona']}")
+                    if 'sigla' in row:
+                        st.write(f"Sigla: {row['sigla']}")
+                
+                # Diretrizes Urbanísticas Específicas DIUPE
+                elif row['Shapefile'] == 'diretrizes_urbanisticas_especificas_diupe':
+                    # Exibir o título uma vez
+                    st.subheader("Diretrizes Urbanísticas Específicas DIUPE")
+                    
+                    # Exibir as informações, se existirem
+                    if 'di_nome' in row:
+                        st.write(f"Nome: {row['di_nome']}")
+                    if 'di_process' in row:
+                        st.write(f"Número do Processo: {row['di_process']}")
+                    if 'di_link' in row:
+                        st.write(f"Link do Processo: {row['di_link']}")
+
+                # Zoneamento Das Diretrizes Urbansticias
+                elif row['Shapefile'] == 'zoneamento_das_diretrizes_urbanisticas':
+                    # Exibir o título uma vez
+                    st.subheader("Zoneamento Das Diretrizes Urbansticias")
+                    
+                    # Exibir as informações, se existirem
+                    if 'etuz_zona' in row:
+                        st.write(f"Zona: {row['etuz_zona']}")
+
+                # Novos Parcelamentos
+                elif row['Shapefile'] == 'novos_parcelamentos':
+                    # Exibir o título uma vez
+                    st.subheader("Novos Parcelamentos")
+                    
+                    # Exibir as informações, se existirem
+                    if 'upar_statu' in row:
+                        st.write(f"Status: {row['upar_statu']}")
+                    if 'upar_diupe' in row:
+                        st.write(f"DIUPE: {row['upar_diupe']}")
+                    if 'upar_diurb' in row:
+                        st.write(f"DIURB: {row['upar_diurb']}")
+                    if 'upar_propr' in row:
+                        st.write(f"Natureza da propriedade: {row['upar_propr']}")
+                    if 'upar_modal' in row:
+                        st.write(f" Tipo: {row['upar_modal']}")
+                    if 'upar_nm_pa' in row:
+                        st.write(f"Nome: {row['upar_nm_pa']}")
+                    if 'upar_num_p' in row:
+                        st.write(f"Número do Processo: {row['upar_num_p']}")
             
         # Ordenar por shapefile e ID
         df = df.sort_values(by=['Shapefile', 'ID_Polígono'])
         
         # Mostrar tabela com scroll
-        st.dataframe(
-            df,
-            height=min(400, 35 * (len(df) + 1)),
-            use_container_width=True
-        )
+        #st.dataframe(
+        #    df,
+        #    height=min(400, 35 * (len(df) + 1)),
+        #    use_container_width=True
+        #)
         
         # Opção para exportar
         st.download_button(
